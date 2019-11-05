@@ -409,14 +409,16 @@ def drawScore():
     g.tft.text(100,2,'l {}'.format( game['life'] ),COLOR_MENU)
 
 def drawApple():
-    drawBox(apple['x'], apple['y'], COLOR_APPLE)
-    g.tft.rect(OX + apple['x']* SNAKE_SIZE + int(SNAKE_SIZE/2), OY + apple['y'] * SNAKE_SIZE-1, 1,1, COLOR_APPLE, COLOR_APPLE)
+    drawBall (apple['x'], apple['y'], COLOR_APPLE)
 
 def drawDot(x, y, color):
     g.tft.rect(OX + x * SNAKE_SIZE, OY + y * SNAKE_SIZE, SNAKE_SIZE, SNAKE_SIZE,color,color )
 
 def drawBox(x, y, color):
     g.tft.rect(OX + x * SNAKE_SIZE, OY + y * SNAKE_SIZE, SNAKE_SIZE, SNAKE_SIZE, color)
+
+def drawBall (x, y, color):
+    g.tft.circle (OX + x * SNAKE_SIZE + int(SNAKE_SIZE//2), OY + y * SNAKE_SIZE + int(SNAKE_SIZE//2) , int(SNAKE_SIZE//2),color, color)
 
 
 # ----------------------------------------------------------
