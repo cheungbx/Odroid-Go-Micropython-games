@@ -15,5 +15,5 @@
 # usage:
 # from gameogo import *
 # g=gameOGO()
-# follow by your game logics
+# follow by your game logics (see the example game source code).
 
