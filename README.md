@@ -8,7 +8,7 @@
 # Note the Lobo version of Miropython for ESP32 is the default micropython build for the Odroid-Go
 # You can follow the instructions on the Odroid-Go Wiki to load micropython firmware to your Odroid-go
 # https://wiki.odroid.com/odroid_go/micropython/01_micropython_setup
-# Then copy my gameodo.py file on to /pyboard/flash
+# Then copy my gameogo.py file on to /pyboard/flash
 # Then develop your game program based on these libraries.
 # see invadero.py or snakeo.py as examples
 #
