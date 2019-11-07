@@ -266,11 +266,11 @@ class gameOGO():
     def setFrameRate(self) :
         if self.pressed(self.btnSel):
             if self.justPressed(self.btnU) :
-                self.frameRate = self.frameRate + 5 if self.frameRate < 100 else 5
+                self.frameRate = self.frameRate + 5 if self.frameRate < 120 else 5
                 self.playTone('e4', 100)
                 return True
             elif self.justPressed(self.btnD) :
-                self.frameRate = self.frameRate - 5 if self.frameRate > 5 else 100
+                self.frameRate = self.frameRate - 5 if self.frameRate > 5 else 120
                 self.playTone('f4', 100)
                 return True
         return False
