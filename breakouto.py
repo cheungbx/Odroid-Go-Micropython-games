@@ -1,6 +1,6 @@
 # ----------------------------------------------------------
 #  Breakout.py  Game
-# Use common game module "gameESP.py" for ESP8266  or ESP32
+# Use common game module "gameogo.py" for ESP32 Odroid Go
 # by Billy Cheung  2019 10 26
 #
 import sys
@@ -412,14 +412,14 @@ while not exitGame :
 
       while not gameOver :
           g.getBtn()
-          if demo :
-            if g.justReleased (g.btnMenu) :
+          if g.justReleased (g.btnMenu) :
               g.tft.text( 5, 30,'Demo stopped', COLOR_FG)
 
               sleep_ms(1000)
               gameOver = True
               demoOn = False
-            else :
+
+          if demo :
               paddle.h_position(balls[0].x - int(paddle_width//2) +  g.random (0,int(paddle_width * 0.6)))
           elif usePaddle :
             paddle.h_position(int(g.getPaddle() // 9.57))

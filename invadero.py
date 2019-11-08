@@ -1,6 +1,6 @@
 # Aliens.py
 #
-# Use common game module "gameESP.py" for ESP8266  or ESP32
+# Use common game module "gameogo.py" for ESP32 Odroid Go
 # by Billy Cheung  2019 10 26
 #
 #
@@ -12,7 +12,7 @@ import utime
 from utime import sleep_ms
 import network
 from math import sqrt
-# all dislplay, buttons, paddle, sound logics are in GameESP.mpy module
+# all dislplay, buttons, paddle, sound logics are in gameogo.py module
 from gameogo import *
 g=gameOGO()
 g.tft.font(g.tft.FONT_Ubuntu)
@@ -127,19 +127,20 @@ while not exitGame:
   while True:
     if updateMenu :
         updateMenu = False
+
         g.tft.clear(COLOR_BG)
-        g.tft.text(0,0,'Aliens', COLOR_FG)
+        g.tft.text(0,0,'Breakout', COLOR_FG)
         g.display_vol()
-        g.tft.text(0,g.screenH * 1 // 7,    'A      Start',COLOR_FG)
+        g.tft.text(0,g.screenH * 1 // 7,    'A          Start',COLOR_FG)
         g.tft.text(0,g.screenH * 2 // 7,    'Menu   Quit',COLOR_FG)
         if usePaddle :
-            g.tft.text(0,g.screenH // 7 * 3,'U      Paddle',COLOR_FG)
+            g.tft.text(0,g.screenH // 7 * 3,'U          Paddle',COLOR_FG)
         else :
-            g.tft.text(0,g.screenH // 7 * 3,'U      Button',COLOR_FG)
+            g.tft.text(0,g.screenH // 7 * 3,'U          Button',COLOR_FG)
         if demo :
-            g.tft.text( 0,g.screenH // 7 * 4,'D     AI-Player', COLOR_FG)
+            g.tft.text(0,g.screenH // 7 * 4,'D          AI-Player', COLOR_FG)
         else :
-            g.tft.text( 0,g.screenH // 7 * 4,'D     1-Player',COLOR_FG)
+            g.tft.text(0,g.screenH // 7 * 4,'D          1-Player',COLOR_FG)
         g.tft.text(0,g.screenH // 7 * 5,     'Sel + U/D Frame/s {}'.format(g.frameRate), COLOR_FG)
         g.tft.text(0,g.screenH // 7 * 6,     'Vol + U/D Loudness', COLOR_FG)
 

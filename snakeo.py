@@ -1,6 +1,6 @@
 # ----------------------------------------------------------
 # snake.py Game
-## Use common game module "gameESP.py" for ESP8266  or ESP32
+# Use common game module "gameogo.py" for ESP32 Odroid Go
 # by Billy Cheung  2019 10 26import gc
 import sys
 import gc
@@ -9,7 +9,7 @@ gc.collect()
 import network
 import utime
 from utime import sleep_ms
-# all dislplay, buttons, paddle, sound logics are in gameESP.mpy module
+# all dislplay, buttons, paddle, sound logics are in gameogo.py module
 from gameogo import *
 g=gameOGO()
 
@@ -160,17 +160,19 @@ def handleButtons():
             g.center_msg ("B to stop DEMO",COLOR_MENU, COLOR_BG)
             sleep_ms(1000)
         game ['updateMenu'] = True
-    elif g.pressed(g.btnL) :
+    elif g.pressed(g.btnMenu) :
         game['mode'] = MODE_EXIT
         g.playTone('g5', 100)
   else :
+    if g.justReleased (g.btnMenu):
+              game['demoOn'] = False
+              game['mode'] = MODE_GAMEOVER
+              g.playTone('g5', 100)
+              g.playTone('f5', 100)
+              g.playTone('e5', 100)
+
     if game['demo'] :
-        if g.justReleased (g.btnB):
-            game['demoOn'] = False
-            game['mode'] = MODE_GAMEOVER
-            g.playTone('g5', 100)
-            g.playTone('f5', 100)
-            g.playTone('e5', 100)
+
 
         #get snake's head position
 
@@ -352,7 +354,7 @@ def drawGameMenu():
         clearScreen()
         g.tft.text( 0, 0,'Snake', COLOR_MENU)
         g.display_vol()
-        g.tft.text(0, 2*(fontH+4),"A   START   L   EXIT",COLOR_MENU)
+        g.tft.text(0, 2*(fontH+4),"A   START   Menu   EXIT",COLOR_MENU)
         if game['demo'] :
             g.tft.text(0,3*(fontH+4), 'D   AI-Player', COLOR_MENU)
         else :
