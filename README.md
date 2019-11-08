@@ -10,7 +10,7 @@
 # https://wiki.odroid.com/odroid_go/micropython/01_micropython_setup
 # Then copy my gameogo.py file on to /pyboard/flash
 # Then develop your game program based on these libraries.
-# see invadero.py or snakeo.py as examples
+# see invadero.py or snakeo.py or breakouto.py or pongo.py as examples
 #
 # usage:
 # from gameogo import *
