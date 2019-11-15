@@ -1,4 +1,4 @@
-# Aliens.py
+# invadero.py
 #
 # Use common game module "gameogo.py" for ESP32 Odroid Go
 # by Billy Cheung  2019 10 26
@@ -29,6 +29,14 @@ g.tft.set_fg(COLOR_FG)
 g.tft.font(g.tft.FONT_Ubuntu)
 
 g.frameRate = 30
+g.tempo = 1
+g.songBuf = [ g.songStart,
+ # Frequency, timeunit
+ 440, 500, 440, 500, 440, 500, 349, 350, 523, 150,   440, 500, 349, 350, 523, 150, 440, 650, 0,500, 659, 500, 659, 500, 659, 500,  698, 350, 523, 150, 415, 500, 349, 350, 523, 150, 440, 650, 0, 500,
+ 880, 500, 440, 300, 440, 150, 880, 500, 830, 325, 784, 175, 740, 125, 698, 125,  740, 250, 0, 325,  445, 250, 622, 500, 587, 325,   554, 175,   523, 125,  466, 125,   523, 250,  0, 350,
+ 349, 250,  415, 500, 349, 350, 440, 125, 523, 500, 440, 375,   523, 125, 659, 650, 0, 500,349, 250,  415, 500, 349, 375, 523, 125, 440, 500,  349, 375,   523, 125, 440, 650,0, 650,
+ 880, 500, 440, 300, 440, 150, 880, 500, 830, 325, 784, 175, 740, 125, 698, 125,  740, 250, 0, 325,  445, 250, 622, 500, 587, 325,   554, 175,   523, 125,  466, 125,   523, 250,  0, 350,
+g.songLoop]
 
 
 AlienRows = 5
@@ -124,6 +132,7 @@ while not exitGame:
   life = 3
   updateMenu = True
   #menu screen
+  g.startSong()
   while True:
     if updateMenu :
         updateMenu = False
@@ -224,10 +233,10 @@ while not exitGame:
       AlienFrame = frameCount
       postureA = not postureA
       # move Aliens once every 15 frames
-      if postureA :
-          g.playSound (80, 10)
-      else:
-          g.playSound (120, 10)
+      # if postureA :
+      #    g.playSound (80, 10)
+      # else:
+      #    g.playSound (120, 10)
 
       for i in Aliens :
           g.tft.rect(i.x,i.y,i.w,i.h, COLOR_BG, COLOR_BG) # Erase Aliens
