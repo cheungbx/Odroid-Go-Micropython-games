@@ -1,7 +1,7 @@
-# menu.py.
+# menuo.py.
 # startup menu and launcher for other python programs
 #
-# Use common game module "gameESP.py" for ESP8266  or ESP32
+# Use common game module "gameogo.py" for ESP32 Odroid Go
 # by Billy Cheung  2019 10 26
 
 import os
@@ -109,7 +109,7 @@ def do_menu (g) :
 
 go_on = True
 from gameogo import gameOGO
-g=gameOGO()
+g=gameOGO(False)
 while go_on :
 
   go_on = do_menu(g)

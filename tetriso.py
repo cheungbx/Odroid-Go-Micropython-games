@@ -22,7 +22,7 @@ g.tft.set_bg(COLOR_BG)
 g.tft.set_fg(COLOR_FG)
 g.tft.font(g.tft.FONT_Ubuntu)
 
-g.frameRate = 30
+g.frameRate = 10
 
 # size = width, height = 200, 400
 size = width, height = 120, 240
@@ -48,6 +48,14 @@ new_shape_color = 0
 occupied_squares = []
 occupied_colors = []
 
+
+
+g.songBuf = [ g.songStart,
+# Frequency, timeunit
+  659,2, 494, 1, 523,1, 587,2, 523, 1, 493, 1, 440, 2, 440, 1, 523,1, 659,2,587,1,523,1,493,2, 493,1,523,1,587,2,659,2,523,2,440,2,440,2,0,2,587, 1,698,1,880,2,783,1,698,1,659,2,523,1,659,2,587,1,523,1,493,2,493,1,523,1,587,2,659,2,523,2,440,2,440,2,0,2,
+  329,4,261,4,293,4,246,4,261,4,220,4,207,4,246,4,329,4,261,4,293,4,246,4,261,2,329,2,440,4,415,6,0,2,
+  g.songLoop]
+
 def reset_board():
     global shape_blcks, shape_name, occupied_squares, occupied_colors
     shape_blcks = []
@@ -56,6 +64,7 @@ def reset_board():
     occupied_colors = []
     g.tft.clear(COLOR_BG)
     g.tft.rect(top_x-1, top_y-1, width+2, height+2,g.tft.RED)
+    g.songIndex=1
 
 def drawScore () :
   global score, life
@@ -242,9 +251,11 @@ def rotate():
 exitGame = False
 demo = False
 demoOn = False
-while not exitGame:
 
+while not exitGame:
+  g.startSong()
   updateMenu = True
+  gameOver = False
   #menu screen
   while True:
     if updateMenu :
@@ -268,9 +279,11 @@ while not exitGame:
          updateMenu = True
     elif g.setFrameRate():
          updateMenu = True
-    elif g.justReleased(g.btnMenu) :
+    elif g.justPressed(g.btnMenu) :
          exitGame = True
          gameOver= True
+         g.tft.clear(COLOR_BG)
+         g.center_msg(" Game Exited ",COLOR_FG, COLOR_BG)
          break
     elif g.justPressed(g.btnA) :
         if demo :
@@ -284,12 +297,12 @@ while not exitGame:
         updateMenu = True
     sleep_ms(10)
 
+  if not exitGame :
+    life = 3
+    Score = 0
+    reset_board()
+    create_newshape()
 
-  life = 3
-  Score = 0
-  reset_board()
-  create_newshape()
-  gameOver = False
   # game loop
   while not gameOver:
     drawScore()
@@ -304,44 +317,44 @@ while not exitGame:
     if legal(shape_blcks):
         draw_shape()
     else:
+        g.playTone('g4', 100)
+        g.playTone('e4', 100)
+        g.playTone('c4', 100)
         life -= 1
         if life <= 0 :
             gameOver = True
+            g.center_msg(" Game Over  ",COLOR_FG, COLOR_BG)
+            sleep_ms(2000)
             break
         else :
-           g.playTone('g4', 100)
-           g.playTone('e4', 100)
-           g.playTone('c4', 100)
-           sleep_ms(2000)
-           reset_board()
-           continue
+            sleep_ms(1000)
+            reset_board()
+            g.startSong()
+            continue
 
-    while True:
+
+    while True :
         mov_delay = 100
         move_dir  = 'down'
         g.getBtn()
         if game == 'paused':
             if g.justPressed(g.btnB) :
-                g.playTone('c4', 100)
-                g.playTone('e4', 100)
                 game = 'playing'
         else:
             if g.justPressed(g.btnB) :
-                g.playTone('e4', 100)
-                g.playTone('f4', 100)
                 game = 'paused'
                 move_dir  = 'pause'
-            elif g.pressed(g.btnMenu) :
+            elif g.justPressed(g.btnMenu) :
+                g.center_msg(" Return to Menu  ",COLOR_FG, COLOR_BG)
+                sleep_ms(1000)
                 gameOver = True
                 break
             elif g.pressed(g.btnD) :
                 mov_delay = 10
-                g.playTone('c4', 10)
                 move_dir  = 'down'
             elif g.justPressed(g.btnA | g.btnU) :
                 shape_blcks = rotate()
                 draw_shape()
-                g.playTone('c5', 10)
                 sleep_ms(r_delay)
                 continue
             elif g.pressed(g.btnL):
@@ -349,7 +362,6 @@ while not exitGame:
                 mov_delay = 50
                 move (move_dir)
                 draw_shape()
-                g.playTone('a4', 10)
                 sleep_ms(mov_delay)
                 continue
             elif g.pressed(g.btnR):
@@ -357,7 +369,6 @@ while not exitGame:
                 mov_delay = 50
                 move (move_dir)
                 draw_shape()
-                g.playTone('b4', 10)
                 sleep_ms(mov_delay)
                 continue
 
@@ -379,8 +390,7 @@ while not exitGame:
 
 
             draw_shape()
-            sleep_ms(mov_delay)
-            g.wait()
+#           sleep_ms(mov_delay)
 
             for row_no in range (height - sqrsize + top_y, 0, -sqrsize):
                 if row_filled(row_no):
@@ -392,14 +402,8 @@ while not exitGame:
                     g.playTone('g4', 100)
                     g.playTone('e4', 100)
                     g.playTone('c4', 100)
-
-  if gameOver :
-       g.center_msg("Game Over",COLOR_FG, COLOR_BG)
-       g.playTone('c4', 100)
-       g.playTone('e4', 100)
-       g.playTone('g4', 100)
-       sleep_ms(2000)
-
+#            g.playSong()
+            g.wait()
 
 g.deinit()
 del sys.modules["gameogo"]

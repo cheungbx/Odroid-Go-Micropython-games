@@ -76,7 +76,7 @@ A         IO32
 '''
 import utime
 from utime import sleep_ms,ticks_ms, ticks_us, ticks_diff
-from machine import Pin, SPI, PWM, ADC
+from machine import Pin, SPI, PWM, ADC, Timer
 from random import randint, seed
 from micropython import const
 import display
@@ -139,11 +139,12 @@ class gameOGO():
         ' ': 0
     }
 
-    def __init__(self):
+    def __init__(self, enableSong = True):
         # True =  SPI display, False = I2C display
+
         self.ESP32 = True
         self.useSPI = True
-        self.timer = 0
+        self.displayTimer = ticks_ms()
         self.vol = int(self.max_vol/2) + 1
         seed(ticks_us())
         self.btnU = 1 << 1
@@ -168,12 +169,22 @@ class gameOGO():
         self.btnSelval  = 0
         self.btnStval   = 0
         self.frameRate  = 30
-
+        self.songIndex = 0
+        self.songStart = -1
+        self.songEnd = -1
+        self.songLoop = -2
+        self.silence  = 0
+        self.tempo = 200
+        self.songBuf = []
         self.Btns = 0
         self.lastBtns = 0
 
+        self.dac_pin = Pin(25, Pin.OUT, value=1) # switch speaker on
         self.PinBuzzer = Pin(26, Pin.OUT)
-
+        self.beeper = PWM(self.PinBuzzer, 500, duty=0)
+        self.beeper2 = PWM(self.PinBuzzer, 500, duty=0)
+        self.timerStarted = False
+        self.enableSong = enableSong
         self.tft = display.TFT()
         self.tft.init(self.tft.ILI9341, width=240, height=320, speed=40000000, backl_pin=14, backl_on=1, miso=19, mosi=23, clk=18, cs=5, dc=21, hastouch=False)
         self.tft.clear(self.tft.BLACK)
@@ -208,10 +219,15 @@ class gameOGO():
 
     def deinit(self) :
       #self.adc.deinit()
+
+      self.beeper.deinit()
+      self.beeper2.deinit()
       self.adcX.deinit()
       self.adcY.deinit()
       self.tft.deinit()
-
+      self.songIndex = 0
+      if self.timerStarted :
+          self.timer.deinit()
 
     def getPaddle (self) :
       return 512
@@ -294,25 +310,58 @@ class gameOGO():
         self.tft.rect(self.screenW-fontW*self.max_vol+1, 1, self.vol * fontW-2,fontH-2, self.tft.RED, self.tft.RED)
 
     def playTone(self, tone, tone_duration, rest_duration=0):
-        beeper = PWM(self.PinBuzzer, freq=self.tones[tone], duty=self.duty[self.vol])
+
+        self.beeper = PWM(self.PinBuzzer, self.tones[tone], self.duty[self.vol])
         sleep_ms(tone_duration)
-        beeper.deinit()
+        self.beeper.deinit()
         sleep_ms(rest_duration)
 
     def playSound(self, freq, tone_duration, rest_duration=0):
-        beeper = PWM(self.PinBuzzer, freq, duty=self.duty[self.vol])
+
+        self.beeper = PWM(self.PinBuzzer, freq, self.duty[self.vol])
         sleep_ms(tone_duration)
-        beeper.deinit()
+        self.beeper.deinit()
         sleep_ms(rest_duration)
+
+    def handleInterrupt(self,timer):
+        self.beeper2.deinit() # note has been played logn enough, now stop sound
+
+        if self.songBuf[self.songIndex] == self.songLoop :
+            self.songIndex = 1 # repeat from first note
+
+        if self.songBuf[self.songIndex] == self.songEnd :
+            pass
+        else :
+            if self.songBuf[self.songIndex] > 0 :
+                self.beeper2 = PWM(self.PinBuzzer, self.songBuf[self.songIndex], self.duty[self.vol])
+            else :
+                self.beeper2 = PWM(self.PinBuzzer, 100,0)
+            self.timer.init(period=self.songBuf[self.songIndex+1] * self.tempo, mode=Timer.ONE_SHOT, callback=self.handleInterrupt)
+            self.songIndex +=2
+
+
+    def setupSong(self):
+        self.timer=Timer(1)
+
+    def startSong(self):
+        self.songIndex = 1
+        if not self.timerStarted :
+            self.timerStarted = True
+            self.timer = Timer(1)
+        self.timer.init(period=100 , mode=Timer.ONE_SHOT, callback=self.handleInterrupt)
+
+    def stopSong(self):
+        self.songIndex = 0
+
 
     def random (self, x, y) :
         return  randint(x,y)
 
     def wait(self) :
-        timer_dif = int(1000/self.frameRate) - ticks_diff(ticks_ms(), self.timer)
+        timer_dif = int(1000/self.frameRate) - ticks_diff(ticks_ms(), self.displayTimer)
         if timer_dif > 0 :
             sleep_ms(timer_dif)
-        self.timer=ticks_ms()
+        self.displayTtimer=ticks_ms()
 
 
 class Rect (object):
