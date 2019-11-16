@@ -139,13 +139,13 @@ class gameOGO():
         ' ': 0
     }
 
-    def __init__(self, enableSong = True):
+    def __init__(self):
         # True =  SPI display, False = I2C display
 
         self.ESP32 = True
         self.useSPI = True
         self.displayTimer = ticks_ms()
-        self.vol = int(self.max_vol/2) + 1
+        self.vol = int(self.max_vol)
         seed(ticks_us())
         self.btnU = 1 << 1
         self.btnL = 1 << 2
@@ -169,12 +169,16 @@ class gameOGO():
         self.btnSelval  = 0
         self.btnStval   = 0
         self.frameRate  = 30
+        self.maxBgm = 1
+        self.bgm = 1
         self.songIndex = 0
         self.songStart = -1
-        self.songEnd = -1
-        self.songLoop = -2
+        self.songEnd   = -2
+        self.songLoop  = -3
         self.silence  = 0
-        self.tempo = 200
+        self.songSpeed = 1
+        self.timeunit = 1
+        self.notes = False
         self.songBuf = []
         self.Btns = 0
         self.lastBtns = 0
@@ -183,8 +187,7 @@ class gameOGO():
         self.PinBuzzer = Pin(26, Pin.OUT)
         self.beeper = PWM(self.PinBuzzer, 500, duty=0)
         self.beeper2 = PWM(self.PinBuzzer, 500, duty=0)
-        self.timerStarted = False
-        self.enableSong = enableSong
+        self.timerInitialized = False
         self.tft = display.TFT()
         self.tft.init(self.tft.ILI9341, width=240, height=320, speed=40000000, backl_pin=14, backl_on=1, miso=19, mosi=23, clk=18, cs=5, dc=21, hastouch=False)
         self.tft.clear(self.tft.BLACK)
@@ -226,7 +229,7 @@ class gameOGO():
       self.adcY.deinit()
       self.tft.deinit()
       self.songIndex = 0
-      if self.timerStarted :
+      if self.timerInitialized :
           self.timer.deinit()
 
     def getPaddle (self) :
@@ -277,6 +280,7 @@ class gameOGO():
                 self.vol= max (self.vol-1, 0)
                 self.playTone('d4', 100)
                 return True
+
         return False
 
     def setFrameRate(self) :
@@ -327,28 +331,32 @@ class gameOGO():
         self.beeper2.deinit() # note has been played logn enough, now stop sound
 
         if self.songBuf[self.songIndex] == self.songLoop :
-            self.songIndex = 1 # repeat from first note
+            self.songIndex = 3 # repeat from first note
 
-        if self.songBuf[self.songIndex] == self.songEnd :
-            pass
-        else :
-            if self.songBuf[self.songIndex] > 0 :
-                self.beeper2 = PWM(self.PinBuzzer, self.songBuf[self.songIndex], self.duty[self.vol])
-            else :
+        if self.songBuf[self.songIndex] >= 0 :
+            if self.songBuf[self.songIndex] == 0 :
                 self.beeper2 = PWM(self.PinBuzzer, 100,0)
-            self.timer.init(period=self.songBuf[self.songIndex+1] * self.tempo, mode=Timer.ONE_SHOT, callback=self.handleInterrupt)
+            elif self.notes :
+                self.beeper2 = PWM(self.PinBuzzer, self.tones[self.songBuf[self.songIndex]], self.duty[self.vol])
+            else :
+                self.beeper2 = PWM(self.PinBuzzer, self.songBuf[self.songIndex], self.duty[self.vol])
+            self.timer.init(period=int(self.songBuf[self.songIndex+1] * self.timeunit * self.songSpeed) , mode=Timer.ONE_SHOT, callback=self.handleInterrupt)
             self.songIndex +=2
 
-
-    def setupSong(self):
-        self.timer=Timer(1)
-
-    def startSong(self):
-        self.songIndex = 1
-        if not self.timerStarted :
-            self.timerStarted = True
-            self.timer = Timer(1)
-        self.timer.init(period=100 , mode=Timer.ONE_SHOT, callback=self.handleInterrupt)
+    def startSong(self, songBuf=None):
+        if self.bgm :
+            if songBuf != None :
+                self.songBuf = songBuf
+            if self.songBuf[0] != self.songStart :
+                print ("Cannot start Song, Invalid songBuf")
+                return False
+            self.notes = self.songBuf[1]
+            self.timeunit = self.songBuf[2]
+            self.songIndex = 3
+            if not self.timerInitialized :
+                self.timerInitialized = True
+                self.timer = Timer(1)
+            self.timer.init(period=100 , mode=Timer.ONE_SHOT, callback=self.handleInterrupt)
 
     def stopSong(self):
         self.songIndex = 0

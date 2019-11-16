@@ -27,18 +27,41 @@ COLOR_ABULLET = g.tft.YELLOW
 g.tft.set_bg(COLOR_BG)
 g.tft.set_fg(COLOR_FG)
 g.tft.font(g.tft.FONT_Ubuntu)
+# songbuf = [ g.songStart, NotesorFreq , timeunit,
+#             freq1, duration1, freq2, duration2,
+#             g.songLoop  or g.songEnd]
+# Notes or Freq : False=song coded frequencies (Hz), True=song coded in notes, e.g. 'f4' 'f#4')
+# timeunit = value to multiple durations with that number of milli-seconds. Default 1 milli-second.
+# freq1 can be replaced with note, e.g. [g.songStart, 'c4', 200,'d4', 200,'e4',300,'f4', 300,'f#4': 300,'g4',300,g.songEnd]
+# freq1 = 0 for silence notes
+# duration1 is multipled with tempo to arrive at a duration for the  note in millseconds
 
 g.frameRate = 30
-g.tempo = 1
-g.songBuf = [ g.songStart,
- # Frequency, timeunit
- 440, 500, 440, 500, 440, 500, 349, 350, 523, 150,   440, 500, 349, 350, 523, 150, 440, 650, 0,500, 659, 500, 659, 500, 659, 500,  698, 350, 523, 150, 415, 500, 349, 350, 523, 150, 440, 650, 0, 500,
- 880, 500, 440, 300, 440, 150, 880, 500, 830, 325, 784, 175, 740, 125, 698, 125,  740, 250, 0, 325,  445, 250, 622, 500, 587, 325,   554, 175,   523, 125,  466, 125,   523, 250,  0, 350,
- 349, 250,  415, 500, 349, 350, 440, 125, 523, 500, 440, 375,   523, 125, 659, 650, 0, 500,349, 250,  415, 500, 349, 375, 523, 125, 440, 500,  349, 375,   523, 125, 440, 650,0, 650,
- 880, 500, 440, 300, 440, 150, 880, 500, 830, 325, 784, 175, 740, 125, 698, 125,  740, 250, 0, 325,  445, 250, 622, 500, 587, 325,   554, 175,   523, 125,  466, 125,   523, 250,  0, 350,
-g.songLoop]
-
-
+g.maxBgm = 3
+bgmBuf= [
+    [g.songStart, False, 1, g.songEnd],
+    # Empire Strikes Back
+    [ g.songStart,True, 100, 0, 4,
+    'g4',2,'g4',2,'g4',2,'c5',8,'g5',8,0,4,'f5',2,'e5',2,'d5',2,'c6',8,'g5',8, 0,4, 'f5',2,'e5',2,'d5',2,'c6',8,'g5',8,0,4,'f5',2,'e5',2,'f5',2,'d5',8,0,8,
+    'g4',2,'g4',2,'g4',2,'c5',8,'g5',8,0,4,'f5',2,'e5',2,'d5',2,'c6',8,'g5',8, 0,4, 'f5',2,'e5',2,'d5',2,'c6',8,'g5',8,0,4,'f5',2,'e5',2,'f5',2,'d5',8,0,8,
+    'g4',4,'a4',4,0,4,'f5',2,'e5',2,'d5',2,'c5',1,0,1,'c5',2,'d5',1,'e5',1,'d5',2,'a4',2,'b4',4,
+    'g4',4,'a4',4,0,4,'f5',2,'e5',2,'d5',2,'c5',1,0,1,'g5',2,0,1,'d5',1,'d5',4,0,4,
+    'g4',4,'a4',4,0,4,'f5',2,'e5',2,'d5',2,'c5',1,0,1,'c5',2,'d5',1,'e5',1,'d5',2,'a4',2,'b4',4,
+    'e5',1,0,1,'e5',2,'a5',2,'g5',2,'f5',2,'e5',2,'d5',2,'c5',2,'b4',2,'a4',2,'e5',8, 0, 8,
+    g.songLoop],
+    # The Imperial March
+    [ g.songStart,False, 1, 0, 400,
+    440, 400, 0, 100, 440, 400, 0, 100, 440, 400, 0,100, 349, 350, 523, 150,   440, 500, 349, 350, 523, 150, 440, 650, 0,500, 659, 500, 659, 500, 659, 500,  698, 350, 523, 150, 415, 500, 349, 350, 523, 150, 440, 650, 0, 500,
+    880, 500, 440, 300, 440, 150, 880, 500, 830, 325, 784, 175, 740, 125, 698, 125,  740, 250, 0, 325,  445, 250, 622, 500, 587, 325,   554, 175,   523, 125,  466, 125,   523, 250,  0, 350,
+    349, 250,  415, 500, 349, 350, 440, 125, 523, 500, 440, 375,   523, 125, 659, 650, 0, 500,349, 250,  415, 500, 349, 375, 523, 125, 440, 500,  349, 375,   523, 125, 440, 650,0, 650,
+    880, 500, 440, 300, 440, 150, 880, 500, 830, 325, 784, 175, 740, 125, 698, 125,  740, 250, 0, 325,  445, 250, 622, 500, 587, 325,   554, 175,   523, 125,  466, 125,   523, 250,  0, 350,
+    g.songLoop],
+    # Tetris
+    [ g.songStart,False,200, 0, 4,
+    659,2, 494, 1, 523,1, 587,2, 523, 1, 493, 1, 440, 2, 440, 1, 523,1, 659,2,587,1,523,1,493,2, 493,1,523,1,587,2,659,2,523,2,440,2,440,2,0,2,587, 1,698,1,880,2,783,1,698,1,659,2,523,1,659,2,587,1,523,1,493,2,493,1,523,1,587,2,659,2,523,2,440,2,440,2,0,2,
+    329,4,261,4,293,4,246,4,261,4,220,4,207,4,246,4,329,4,261,4,293,4,246,4,261,2,329,2,440,4,415,6,0,2,
+    g.songLoop]
+    ]
 AlienRows = 5
 AliensPerRow = 11
 Spacing = 1.4
@@ -132,7 +155,8 @@ while not exitGame:
   life = 3
   updateMenu = True
   #menu screen
-  g.startSong()
+
+  g.startSong(bgmBuf[g.bgm])
   while True:
     if updateMenu :
         updateMenu = False
@@ -140,18 +164,23 @@ while not exitGame:
         g.tft.clear(COLOR_BG)
         g.tft.text(0,0,'Breakout', COLOR_FG)
         g.display_vol()
-        g.tft.text(0,g.screenH * 1 // 7,    'A          Start',COLOR_FG)
-        g.tft.text(0,g.screenH * 2 // 7,    'Menu   Quit',COLOR_FG)
+        g.tft.text(0,g.screenH * 1 // 8,    'A          Start',COLOR_FG)
+        g.tft.text(0,g.screenH * 2 // 8,    'Menu   Quit',COLOR_FG)
         if usePaddle :
-            g.tft.text(0,g.screenH // 7 * 3,'U          Paddle',COLOR_FG)
+            g.tft.text(0,g.screenH // 8 * 3,'U          Paddle',COLOR_FG)
         else :
-            g.tft.text(0,g.screenH // 7 * 3,'U          Button',COLOR_FG)
+            g.tft.text(0,g.screenH // 8 * 3,'U          Button',COLOR_FG)
         if demo :
-            g.tft.text(0,g.screenH // 7 * 4,'D          AI-Player', COLOR_FG)
+            g.tft.text(0,g.screenH // 8 * 4,'D          AI-Player', COLOR_FG)
         else :
-            g.tft.text(0,g.screenH // 7 * 4,'D          1-Player',COLOR_FG)
-        g.tft.text(0,g.screenH // 7 * 5,     'Sel + U/D Frame/s {}'.format(g.frameRate), COLOR_FG)
-        g.tft.text(0,g.screenH // 7 * 6,     'Vol + U/D Loudness', COLOR_FG)
+            g.tft.text(0,g.screenH // 8 * 4,'D          1-Player',COLOR_FG)
+        if g.bgm :
+            g.tft.text(0,g.screenH // 8 * 7,'R          Background Music {}'.format(g.bgm), COLOR_FG)
+        else :
+            g.tft.text(0,g.screenH // 8 * 7,'R          Background Music Off', COLOR_FG)
+
+        g.tft.text(0,g.screenH // 8 * 5,    'Sel + U/D Frame/s {}'.format(g.frameRate), COLOR_FG)
+        g.tft.text(0,g.screenH // 8 * 6,    'Vol + U/D Loudness', COLOR_FG)
 
     sleep_ms(10)
     g.getBtn()
@@ -176,8 +205,15 @@ while not exitGame:
     elif g.justPressed(g.btnD) :
         demo = not demo
         updateMenu = True
+    elif g.justPressed(g.btnR) :
+        g.bgm = 0 if g.bgm >= g.maxBgm else g.bgm + 1
+        if g.bgm :
+            g.startSong(bgmBuf[g.bgm])
+        else :
+            g.stopSong()
 
 
+        updateMenu = True
   #reset the game
   score = 0
   level = 0
@@ -361,6 +397,9 @@ while not exitGame:
       g.playTone ('e4',100)
       g.playTone ('f4',100)
       g.playTone ('g4',100)
+      g.bgm = 0 if g.bgm >= g.maxBgm else g.bgm + 1
+      if g.bgm :
+        g.startSong(bgmBuf[g.bgm])
 
     if lost :
       lost = False;
